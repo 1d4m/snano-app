@@ -6,12 +6,15 @@ import { useDrawer } from "@/hooks/useDrawer";
 import Link from "next/link";
 import { PlaylistsDrawer } from "@/components/domain/playlists/PlaylistsDrawer";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import { useCreatePlaylist, usePlaylists } from "@/hooks/usePlaylists";
 
 /**
  * プレイリスト一覧ページ
  */
 export default function Page() {
   const { isOpen, openDrawer, closeDrawer } = useDrawer();
+  const { data } = usePlaylists();
+  const { mutate } = useCreatePlaylist();
 
   const selectItems = [
     { id: "1", name: "編集" },
@@ -19,8 +22,8 @@ export default function Page() {
   ];
 
   // プレイリスト追加処理
-  const handleAddPlaylists = () => {
-    alert(1);
+  const handleAddPlaylist = (title: string) => {
+    mutate({ title });
   };
 
   return (
@@ -61,7 +64,7 @@ export default function Page() {
       <PlaylistsDrawer
         isOpen={isOpen}
         onClose={closeDrawer}
-        onSubmit={handleAddPlaylists}
+        onSubmit={handleAddPlaylist}
       />
     </div>
   );
