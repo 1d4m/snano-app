@@ -1,6 +1,6 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const usePlaylists = () => {
+const useReadPlaylists = () => {
   return useQuery({
     queryKey: ["playlists"],
     queryFn: async () => {
@@ -14,6 +14,8 @@ const usePlaylists = () => {
 };
 
 const useCreatePlaylist = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (newPlaylist: { title: string }) => {
       const response = await fetch("/api/playlists", {
@@ -28,7 +30,34 @@ const useCreatePlaylist = () => {
       }
       return response.json();
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+    },
   });
 };
 
-export { usePlaylists, useCreatePlaylist };
+/**
+ * 🔥 プレイリスト削除
+ */
+const useDeletePlaylist = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string | number) => {
+      console.log(id);
+      const response = await fetch(`/api/playlists/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete playlist");
+      }
+      return true;
+    },
+    // 削除後に一覧を再読み込み
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["playlists"] });
+    },
+  });
+};
+
+export { useReadPlaylists, useCreatePlaylist, useDeletePlaylist };
