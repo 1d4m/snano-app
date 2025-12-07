@@ -1,17 +1,24 @@
 "use client";
 
-import { dummyPlaylists } from "./dummy";
 import { Ellipsis, Plus } from "lucide-react";
 import { useDrawer } from "@/hooks/useDrawer";
 import Link from "next/link";
 import { PlaylistsDrawer } from "@/components/domain/playlists/PlaylistsDrawer";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import {
+  useCreatePlaylist,
+  useDeletePlaylist,
+  useReadPlaylists,
+} from "@/hooks/usePlaylists";
 
 /**
  * プレイリスト一覧ページ
  */
 export default function Page() {
   const { isOpen, openDrawer, closeDrawer } = useDrawer();
+  const { data: playlists, isLoading } = useReadPlaylists();
+  const { mutate: createPlaylist } = useCreatePlaylist();
+  const { mutate: deletePlaylist } = useDeletePlaylist();
 
   const selectItems = [
     { id: "1", name: "編集" },
@@ -19,9 +26,18 @@ export default function Page() {
   ];
 
   // プレイリスト追加処理
-  const handleAddPlaylists = () => {
-    alert(1);
+  const handleAddPlaylist = (title: string) => {
+    createPlaylist({ title });
   };
+
+  // プレイリスト削除処理
+  const handleDeletePlaylist = (id: string) => {
+    deletePlaylist(id);
+  };
+
+  if (isLoading) {
+    return <p>loading...</p>;
+  }
 
   return (
     <div>
@@ -36,7 +52,7 @@ export default function Page() {
           <span className="text-sm text-neutral-400">新規追加</span>
         </div>
         <div className="space-y-3">
-          {dummyPlaylists.map((p) => (
+          {playlists.map((p: any) => (
             <div
               key={p.id}
               className="flex items-center justify-between gap-x-2"
@@ -50,7 +66,10 @@ export default function Page() {
                 </Link>
               </div>
               <div className="size-6">
-                <DropdownMenu items={selectItems}>
+                <DropdownMenu
+                  items={selectItems}
+                  onClick={() => handleDeletePlaylist(p.id)}
+                >
                   <Ellipsis />
                 </DropdownMenu>
               </div>
@@ -61,7 +80,7 @@ export default function Page() {
       <PlaylistsDrawer
         isOpen={isOpen}
         onClose={closeDrawer}
-        onSubmit={handleAddPlaylists}
+        onSubmit={handleAddPlaylist}
       />
     </div>
   );

@@ -10,15 +10,18 @@ import {
 type Props = {
   children: React.ReactNode;
   items: { id: string; name: string }[];
+  onClick: () => void;
 };
 
-function DropdownMenu({ children, items }: Props) {
+function DropdownMenu({ children, items, onClick }: Props) {
   return (
     <OriginalDropdownMenu>
       <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {items.map((i) => (
-          <DropdownMenuItem key={i.id}>{i.name}</DropdownMenuItem>
+          <DropdownMenuItem key={i.id} onClick={onClick}>
+            {i.name}
+          </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </OriginalDropdownMenu>

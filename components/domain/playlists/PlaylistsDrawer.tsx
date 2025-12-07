@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: () => void;
+  onSubmit: (title: string) => void;
 };
 
 function PlaylistsDrawer({ isOpen, onClose, onSubmit }: Props) {
@@ -26,7 +26,7 @@ function PlaylistsDrawer({ isOpen, onClose, onSubmit }: Props) {
       submitText="登録する"
       description="プレイリストのタイトルを入力し、登録してください"
       onClose={onClose}
-      onSubmit={onSubmit}
+      onSubmit={() => onSubmit(title)}
     >
       <Input
         value={title}
