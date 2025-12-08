@@ -1,29 +1,39 @@
 "use client";
 
-import { dummyPlaylistsItems } from "./dummy";
 import { ChevronLeft, Ellipsis, Plus } from "lucide-react";
 import { useDrawer } from "@/hooks/useDrawer";
 import Link from "next/link";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { PlaylistsItemDrawer } from "@/components/domain/playlists-item/PlaylistsItemDrawer";
 import { useParams } from "next/navigation";
+import {
+  useCreatePlaylistItems,
+  useReadPlaylistItems,
+} from "@/hooks/usePlaylistItems";
+import { toStringParam } from "@/utils/params";
 
 /**
  * プレイリストアイテムページ
  */
 export default function Page() {
-  const { isOpen, openDrawer, closeDrawer } = useDrawer();
   const params = useParams();
+  const playlistId = toStringParam(params.id);
+  const { isOpen, openDrawer, closeDrawer } = useDrawer();
 
-  const selectItems = [
-    { id: "1", name: "編集" },
-    { id: "2", name: "削除" },
-  ];
+  const { data: playlistItems = [], isLoading } =
+    useReadPlaylistItems(playlistId);
 
-  // プレイリスト追加処理
-  const handleAddPlaylists = () => {
-    alert(1);
+  const { mutate: createPlaylistItem } = useCreatePlaylistItems();
+
+  // プレイリストアイテム追加処理
+  const handleAddPlaylistItem = (item: any) => {
+    const newItem = { ...item, playlist_id: params.id, is_completed: false };
+    createPlaylistItem(newItem);
   };
+
+  if (isLoading) {
+    return <p>loading...</p>;
+  }
 
   return (
     <div>
@@ -44,7 +54,7 @@ export default function Page() {
           <span className="text-sm text-neutral-400">新規追加</span>
         </div>
         <div className="space-y-3">
-          {dummyPlaylistsItems.map((p) => (
+          {playlistItems.map((p) => (
             <div
               key={p.id}
               className="flex items-center justify-between gap-x-2"
@@ -56,9 +66,22 @@ export default function Page() {
                 </div>
               </div>
               <div className="size-6">
-                <DropdownMenu items={selectItems}>
-                  <Ellipsis />
-                </DropdownMenu>
+                <DropdownMenu
+                  trigger={<Ellipsis className="size-5" />}
+                  items={[
+                    {
+                      id: "edit",
+                      label: "編集",
+                      onClick: () => console.log("編集"),
+                    },
+                    {
+                      id: "delete",
+                      label: "削除",
+                      danger: true,
+                      onClick: () => console.log("削除"),
+                    },
+                  ]}
+                />
               </div>
             </div>
           ))}
@@ -67,7 +90,7 @@ export default function Page() {
       <PlaylistsItemDrawer
         isOpen={isOpen}
         onClose={closeDrawer}
-        onSubmit={handleAddPlaylists}
+        onSubmit={handleAddPlaylistItem}
       />
     </div>
   );

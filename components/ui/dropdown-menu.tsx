@@ -7,20 +7,36 @@ import {
   DropdownMenu as OriginalDropdownMenu,
 } from "@radix-ui/react-dropdown-menu";
 
-type Props = {
-  children: React.ReactNode;
-  items: { id: string; name: string }[];
+type MenuItem = {
+  id: string;
+  label: string;
   onClick: () => void;
+  icon?: React.ReactNode;
+  danger?: boolean;
+  disabled?: boolean;
 };
 
-function DropdownMenu({ children, items, onClick }: Props) {
+type Props = {
+  trigger: React.ReactNode;
+  items: MenuItem[];
+};
+
+function DropdownMenu({ trigger, items }: Props) {
   return (
     <OriginalDropdownMenu>
-      <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {items.map((i) => (
-          <DropdownMenuItem key={i.id} onClick={onClick}>
-            {i.name}
+        {items.map((item) => (
+          <DropdownMenuItem
+            key={item.id}
+            onClick={item.onClick}
+            disabled={item.disabled}
+            className={item.danger ? "text-red-500" : ""}
+          >
+            <div className="flex items-center gap-x-2">
+              {item.icon}
+              {item.label}
+            </div>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

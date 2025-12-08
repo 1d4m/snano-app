@@ -20,11 +20,6 @@ export default function Page() {
   const { mutate: createPlaylist } = useCreatePlaylist();
   const { mutate: deletePlaylist } = useDeletePlaylist();
 
-  const selectItems = [
-    { id: "1", name: "編集" },
-    { id: "2", name: "削除" },
-  ];
-
   // プレイリスト追加処理
   const handleAddPlaylist = (title: string) => {
     createPlaylist({ title });
@@ -67,11 +62,21 @@ export default function Page() {
               </div>
               <div className="size-6">
                 <DropdownMenu
-                  items={selectItems}
-                  onClick={() => handleDeletePlaylist(p.id)}
-                >
-                  <Ellipsis />
-                </DropdownMenu>
+                  trigger={<Ellipsis className="size-5" />}
+                  items={[
+                    {
+                      id: "edit",
+                      label: "編集",
+                      onClick: () => console.log("編集"),
+                    },
+                    {
+                      id: "delete",
+                      label: "削除",
+                      danger: true,
+                      onClick: () => handleDeletePlaylist(p.id),
+                    },
+                  ]}
+                />
               </div>
             </div>
           ))}

@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: () => void;
+  onSubmit: (item: any) => void;
 };
 
 function PlaylistsItemDrawer({ isOpen, onClose, onSubmit }: Props) {
@@ -29,7 +29,7 @@ function PlaylistsItemDrawer({ isOpen, onClose, onSubmit }: Props) {
       submitText="登録する"
       description="プレイリストのタイトルを入力し、登録してください"
       onClose={onClose}
-      onSubmit={onSubmit}
+      onSubmit={() => onSubmit({ title, limit_at: limitAt, description })}
     >
       <Input
         value={title}
