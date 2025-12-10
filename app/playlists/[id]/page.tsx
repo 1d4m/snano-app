@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, Ellipsis, Plus } from "lucide-react";
+import { AudioLines, ChevronLeft, Ellipsis, Play, Plus } from "lucide-react";
 import { useDrawer } from "@/hooks/useDrawer";
 import Link from "next/link";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
@@ -11,6 +11,7 @@ import {
   useReadPlaylistItems,
 } from "@/hooks/usePlaylistItems";
 import { toStringParam } from "@/utils/params";
+import { useBoundStore } from "@/store/store";
 
 /**
  * プレイリストアイテムページ
@@ -24,6 +25,10 @@ export default function Page() {
     useReadPlaylistItems(playlistId);
 
   const { mutate: createPlaylistItem } = useCreatePlaylistItems();
+
+  const setItem = useBoundStore((state) => state.setItem);
+  const isPlaying = useBoundStore((state) => state.isPlaying);
+  const item = useBoundStore((state) => state.currentItem);
 
   // プレイリストアイテム追加処理
   const handleAddPlaylistItem = (item: any) => {
@@ -61,7 +66,16 @@ export default function Page() {
             >
               <div className="flex-1">
                 <div className="flex-1 flex items-center gap-x-2">
-                  <div className="w-10 h-10 rounded-md bg-neutral-800"></div>
+                  <div
+                    className="flex items-center justify-center size-10 bg-[#121212] rounded-b-lg"
+                    onClick={() => setItem(p)}
+                  >
+                    {item?.id === p.id && isPlaying ? (
+                      <AudioLines className="size-4.5" />
+                    ) : (
+                      <Play className="size-4.5" />
+                    )}
+                  </div>
                   <div className="flex-1 text-sm">{p.title}</div>
                 </div>
               </div>
