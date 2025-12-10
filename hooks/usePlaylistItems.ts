@@ -1,4 +1,6 @@
+import { PlaylistItem } from "@/types/playlistItem";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import camelcaseKeys from "camelcase-keys";
 
 const useReadPlaylistItems = (id: string) => {
   return useQuery<PlaylistItem[], Error, PlaylistItem[]>({
@@ -10,6 +12,7 @@ const useReadPlaylistItems = (id: string) => {
       }
       return response.json();
     },
+    select: (data) => camelcaseKeys(data, { deep: true }),
   });
 };
 
