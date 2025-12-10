@@ -6,3 +6,5 @@ type PlaylistItem = {
   limitAt: number;
   isCompleted: boolean;
 };
+
+export type { PlaylistItem };
