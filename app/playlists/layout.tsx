@@ -1,3 +1,4 @@
+import { Navigation } from "@/components/domain/navigation/Navigation";
 import { Player } from "@/components/domain/player/Player";
 import { PlayerCompleteModal } from "@/components/domain/player/PlayerCompleteModal";
 
@@ -11,6 +12,7 @@ export default function Layout({ children }: Props) {
       {children}
       <Player />
       <PlayerCompleteModal />
+      <Navigation />
     </>
   );
 }
