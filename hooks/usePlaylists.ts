@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+/**
+ * プレイリスト一覧取得
+ * @returns
+ */
 const useReadPlaylists = () => {
   return useQuery({
     queryKey: ["playlists"],
@@ -13,6 +17,28 @@ const useReadPlaylists = () => {
   });
 };
 
+/**
+ * プレイリスト取得
+ * @param id
+ * @returns
+ */
+const useReadPlaylist = (id: string | number) => {
+  return useQuery({
+    queryKey: ["playlists", id],
+    queryFn: async () => {
+      const response = await fetch(`/api/playlists/${id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch playlist");
+      }
+      return response.json();
+    },
+  });
+};
+
+/**
+ * プレイリスト作成
+ * @returns
+ */
 const useCreatePlaylist = () => {
   const queryClient = useQueryClient();
 
@@ -37,7 +63,8 @@ const useCreatePlaylist = () => {
 };
 
 /**
- * 🔥 プレイリスト削除
+ * プレイリスト削除
+ * @returns
  */
 const useDeletePlaylist = () => {
   const queryClient = useQueryClient();
@@ -60,4 +87,9 @@ const useDeletePlaylist = () => {
   });
 };
 
-export { useReadPlaylists, useCreatePlaylist, useDeletePlaylist };
+export {
+  useReadPlaylists,
+  useCreatePlaylist,
+  useDeletePlaylist,
+  useReadPlaylist,
+};

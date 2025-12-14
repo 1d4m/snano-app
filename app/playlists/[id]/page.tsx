@@ -1,17 +1,22 @@
 "use client";
 
-import { AudioLines, ChevronLeft, Ellipsis, Play, Plus } from "lucide-react";
-import { useDrawer } from "@/hooks/useDrawer";
+import { ChevronLeft, Ellipsis, Plus } from "lucide-react";
 import Link from "next/link";
-import { DropdownMenu } from "@/components/ui/dropdown-menu";
-import { PlaylistsItemDrawer } from "@/components/domain/playlists-item/PlaylistsItemDrawer";
 import { useParams } from "next/navigation";
+
+import { PlayingAnimation } from "@/components/domain/player/PlayingAnimation";
+import { PlaylistsItemDrawer } from "@/components/domain/playlists-item/PlaylistsItemDrawer";
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import { useDrawer } from "@/hooks/useDrawer";
 import {
   useCreatePlaylistItems,
+  useDeletePlaylistItem,
   useReadPlaylistItems,
 } from "@/hooks/usePlaylistItems";
+import { useReadPlaylist } from "@/hooks/usePlaylists";
+import { cn } from "@/lib/utils";
+import { useBoundStore } from "@/store";
 import { toStringParam } from "@/utils/params";
-import { useBoundStore } from "@/store/store";
 
 /**
  * プレイリストアイテムページ
@@ -23,8 +28,11 @@ export default function Page() {
 
   const { data: playlistItems = [], isLoading } =
     useReadPlaylistItems(playlistId);
+  const { data: playlist, isLoading: playlistLoading } =
+    useReadPlaylist(playlistId);
 
   const { mutate: createPlaylistItem } = useCreatePlaylistItems();
+  const { mutate: deletePlaylistItem } = useDeletePlaylistItem();
 
   const setItem = useBoundStore((state) => state.setItem);
   const isPlaying = useBoundStore((state) => state.isPlaying);
@@ -34,6 +42,10 @@ export default function Page() {
   const handleAddPlaylistItem = (item: any) => {
     const newItem = { ...item, playlist_id: params.id, is_completed: false };
     createPlaylistItem(newItem);
+  };
+
+  const handleDeletePlaylistItem = (id: number) => {
+    deletePlaylistItem(id);
   };
 
   if (isLoading) {
@@ -48,7 +60,9 @@ export default function Page() {
             <ChevronLeft className="size-4.5" />
           </Link>
         </div>
-        <h1 className="flex-1 text-center font-bold text-sm">{params.id}</h1>
+        <h1 className="flex-1 text-center font-bold text-sm">
+          {playlistLoading ? "...loading" : playlist.title}
+        </h1>
         <div className="size-10"></div>
       </div>
       <div className="px-3">
@@ -64,22 +78,23 @@ export default function Page() {
               key={p.id}
               className="flex items-center justify-between gap-x-2"
             >
+
               <div className="flex-1">
-                <div className="flex-1 flex items-center gap-x-2">
+                <div className="flex-1 flex items-center gap-x-2" onClick={() => setItem(p)}>
                   <div
-                    className="flex items-center justify-center size-10 bg-[#121212] rounded-b-lg"
-                    onClick={() => setItem(p)}
+                    className="flex items-center justify-center size-10 bg-[#121212] rounded-md"
                   >
-                    {item?.id === p.id && isPlaying ? (
-                      <AudioLines className="size-4.5" />
-                    ) : (
-                      <Play className="size-4.5" />
-                    )}
                   </div>
-                  <div className="flex-1 text-sm">{p.title}</div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-x-1">
+                      {item?.id === p.id && isPlaying && <PlayingAnimation />}
+                      <span className={cn("text-sm text-neutral-400", item?.id === p.id && isPlaying && "text-emerald-400")}>{p.title}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="size-6">
+
+              <div className="size-6 flex items-center">
                 <DropdownMenu
                   trigger={<Ellipsis className="size-5" />}
                   items={[
@@ -92,7 +107,7 @@ export default function Page() {
                       id: "delete",
                       label: "削除",
                       danger: true,
-                      onClick: () => console.log("削除"),
+                      onClick: () => handleDeletePlaylistItem(p.id),
                     },
                   ]}
                 />
