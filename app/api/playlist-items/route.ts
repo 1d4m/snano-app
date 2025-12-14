@@ -1,7 +1,8 @@
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
+
 import { db } from "@/lib/db";
 import { playlist_items } from "@/lib/db/schema";
-import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -36,4 +37,17 @@ export async function POST(request: Request) {
     })
     .returning();
   return NextResponse.json(result);
+}
+
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json({ error: "id is required" }, { status: 400 });
+  }
+
+  await db.delete(playlist_items).where(eq(playlist_items.id, Number(id)));
+
+  return NextResponse.json({ message: "Deleted successfully" });
 }
