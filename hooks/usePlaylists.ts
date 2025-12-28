@@ -1,11 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import camelcaseKeys from "camelcase-keys";
+
+import { PlaylistApiResponse } from "@/types/api/player";
+import { Playlist } from "@/types/entities/playlist";
+
+/**
+ * useQuery<
+  TQueryFnData, // queryFn が返す型
+  TError,       // エラー型
+  TData         // select 後の型
+> {
+}
+
 
 /**
  * プレイリスト一覧取得
  * @returns
  */
 const useReadPlaylists = () => {
-  return useQuery({
+  return useQuery<PlaylistApiResponse[], Error, PlaylistApiResponse[]>({
     queryKey: ["playlists"],
     queryFn: async () => {
       const response = await fetch("/api/playlists");
@@ -14,6 +27,7 @@ const useReadPlaylists = () => {
       }
       return response.json();
     },
+    select: (data) => camelcaseKeys(data, { deep: true }),
   });
 };
 
@@ -23,7 +37,7 @@ const useReadPlaylists = () => {
  * @returns
  */
 const useReadPlaylist = (id: string | number) => {
-  return useQuery({
+  return useQuery<PlaylistApiResponse, Error, Playlist>({
     queryKey: ["playlists", id],
     queryFn: async () => {
       const response = await fetch(`/api/playlists/${id}`);
@@ -32,6 +46,7 @@ const useReadPlaylist = (id: string | number) => {
       }
       return response.json();
     },
+    select: (data) => camelcaseKeys(data, { deep: true }),
   });
 };
 

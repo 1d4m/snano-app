@@ -1,27 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Drawer } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { PlaylistItem } from "@/types/entities/playlistItem";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (item: any) => void;
+  onSubmit: (item: Omit<PlaylistItem, "id" | "playlistId" | "isCompleted">) => void;
 };
 
 function PlaylistsItemDrawer({ isOpen, onClose, onSubmit }: Props) {
   const [title, setTitle] = useState("");
   const [limitAt, setLimitAt] = useState(0);
   const [description, setDescription] = useState("");
-
-  useEffect(() => {
-    if (!isOpen) {
-      setTitle("");
-    }
-  }, [isOpen]);
 
   return (
     <Drawer
@@ -30,7 +25,7 @@ function PlaylistsItemDrawer({ isOpen, onClose, onSubmit }: Props) {
       submitText="登録する"
       description="プレイリストのタイトルを入力し、登録してください"
       onClose={onClose}
-      onSubmit={() => onSubmit({ title, limit_at: limitAt, description })}
+      onSubmit={() => onSubmit({ title, limitAt, description })}
     >
       <Input
         value={title}

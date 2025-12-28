@@ -3,6 +3,7 @@
 import { ChevronLeft, Ellipsis, Plus } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { Suspense } from "react";
 
 import { PlayingAnimation } from "@/components/domain/player/PlayingAnimation";
 import { PlaylistsItemDrawer } from "@/components/domain/playlists-item/PlaylistsItemDrawer";
@@ -16,6 +17,7 @@ import {
 import { useReadPlaylist } from "@/hooks/usePlaylists";
 import { cn } from "@/lib/utils";
 import { useBoundStore } from "@/store";
+import { PlaylistItem } from "@/types/entities/playlistItem";
 import { toStringParam } from "@/utils/params";
 
 /**
@@ -39,8 +41,8 @@ export default function Page() {
   const item = useBoundStore((state) => state.currentItem);
 
   // プレイリストアイテム追加処理
-  const handleAddPlaylistItem = (item: any) => {
-    const newItem = { ...item, playlist_id: params.id, is_completed: false };
+  const handleAddPlaylistItem = (item: Omit<PlaylistItem, "id" | "playlistId" | "isCompleted">) => {
+    const newItem = { ...item, playlistId: playlistId, isCompleted: false };
     createPlaylistItem(newItem);
   };
 
@@ -48,9 +50,9 @@ export default function Page() {
     deletePlaylistItem(id);
   };
 
-  if (isLoading) {
-    return <p>loading...</p>;
-  }
+if (isLoading || playlistLoading || !playlist) {
+  return <p>loading...</p>;
+}
 
   return (
     <div>
@@ -61,7 +63,9 @@ export default function Page() {
           </Link>
         </div>
         <h1 className="flex-1 text-center font-bold text-sm">
-          {playlistLoading ? "...loading" : playlist.title}
+          <Suspense fallback={<p>...loading</p>}>
+            {playlist.title}
+          </Suspense>
         </h1>
         <div className="size-10"></div>
       </div>
