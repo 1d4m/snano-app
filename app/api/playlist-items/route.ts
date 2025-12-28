@@ -24,17 +24,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { title, description, limit_at, is_completed, playlist_id } =
-    await request.json();
+  const data = await request.json();
+
   const result = await db
     .insert(playlist_items)
-    .values({
-      title,
-      description,
-      limit_at,
-      is_completed,
-      playlist_id,
-    })
+    .values(data)
     .returning();
   return NextResponse.json(result);
 }

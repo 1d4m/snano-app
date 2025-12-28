@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import camelcaseKeys from "camelcase-keys";
+import snakecaseKeys from "snakecase-keys";
 
-import { PlaylistItem } from "@/types/playlistItem";
+import { PlaylistItemApiRequest } from "@/types/api/playlistItem";
+import { PlaylistItem } from "@/types/entities/playlistItem";
 
 const useReadPlaylistItems = (id: string) => {
   return useQuery<PlaylistItem[], Error, PlaylistItem[]>({
@@ -17,20 +19,30 @@ const useReadPlaylistItems = (id: string) => {
   });
 };
 
+/**
+ * プレイリストアイテム作成
+ * 
+ *   TData,     // 成功時に返ってくるデータの型
+ *   TError,    // エラー時の型
+ *   TVariables,// mutate()/mutationFn に渡す引数の型
+ * @returns
+ */
 const useCreatePlaylistItems = () => {
-  return useMutation({
+  return useMutation<PlaylistItem, Error, PlaylistItemApiRequest>({
     mutationFn: async (newItem) => {
+      const snakecaseBody = snakecaseKeys(newItem);
       const response = await fetch("/api/playlist-items", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newItem),
+        body: JSON.stringify(snakecaseBody),
       });
       if (!response.ok) {
         throw new Error("Failed to create playlist item");
       }
-      return response.json();
+      const data = await response.json();
+      return camelcaseKeys(data, { deep: true });
     },
   });
 };

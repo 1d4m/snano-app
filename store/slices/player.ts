@@ -1,5 +1,5 @@
 import { SliceCreator } from "@/store";
-import { PlaylistItem } from "@/types/playlistItem";
+import { PlaylistItem } from "@/types/entities/playlistItem";
 
 
 /**

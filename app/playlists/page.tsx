@@ -17,7 +17,7 @@ import {
  */
 export default function Page() {
   const { isOpen, openDrawer, closeDrawer } = useDrawer();
-  const { data: playlists, isLoading } = useReadPlaylists();
+  const { data: playlists = [], isLoading } = useReadPlaylists();
   const { mutate: createPlaylist } = useCreatePlaylist();
   const { mutate: deletePlaylist } = useDeletePlaylist();
 
@@ -48,7 +48,7 @@ export default function Page() {
           <span className="text-sm text-neutral-400">新規追加</span>
         </div>
         <div className="space-y-3">
-          {playlists.map((p: any) => (
+          {playlists.map((p) => (
             <div
               key={p.id}
               className="flex items-center justify-between gap-x-2"
