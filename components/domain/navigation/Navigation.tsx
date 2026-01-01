@@ -23,7 +23,7 @@ const Navigation = () => {
           </Link>
         </div>
         <div>
-          <Link href={ROUTES.PLAYLIST.href}>
+          <Link href={ROUTES.ACCOUNT.href}>
             <User className="text-neutral-400 size-5" />
           </Link>
         </div>
