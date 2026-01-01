@@ -17,10 +17,10 @@ export default auth((req) => {
     );
   }
 
-  // --- ログイン済の場合：/login に来たらトップへ返す ---
-  if (isLoggedIn && isLogin) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
+  // // --- ログイン済の場合：/login に来たらトップへ返す ---
+  // if (isLoggedIn && isLogin) {
+  //   return NextResponse.redirect(new URL("/", req.url));
+  // }
 
   return NextResponse.next();
 });
