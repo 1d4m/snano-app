@@ -10,7 +10,9 @@ import { PlaylistItem } from "@/types/entities/playlistItem";
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (item: Omit<PlaylistItem, "id" | "playlistId" | "isCompleted">) => void;
+  onSubmit: (
+    item: Omit<PlaylistItem, "id" | "playlistId" | "isCompleted">
+  ) => void;
 };
 
 function PlaylistsItemDrawer({ isOpen, onClose, onSubmit }: Props) {
@@ -25,7 +27,7 @@ function PlaylistsItemDrawer({ isOpen, onClose, onSubmit }: Props) {
       submitText="登録する"
       description="プレイリストのタイトルを入力し、登録してください"
       onClose={onClose}
-      onSubmit={() => onSubmit({ title, limitAt, description })}
+      onSubmit={() => onSubmit({ title, limitAt: limitAt * 60, description })}
     >
       <Input
         value={title}
