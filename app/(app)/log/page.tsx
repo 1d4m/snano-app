@@ -21,16 +21,22 @@ const mockPlaylists: Playlist[] = [
 ];
 
 const mockLogs: Log[] = [
-  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2025-01-10" },
-  { playlist_id: "1", title: "短い休憩開始", created_at: "2025-01-10" },
-  { playlist_id: "2", title: "英語学習開始", created_at: "2025-01-03" },
-  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2025-01-01" },
-  { playlist_id: "3", title: "朝活開始", created_at: "2024-12-31" },
-  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2025-01-10" },
-  { playlist_id: "1", title: "短い休憩開始", created_at: "2025-01-10" },
-  { playlist_id: "2", title: "英語学習開始", created_at: "2025-01-03" },
-  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2025-01-01" },
-  { playlist_id: "3", title: "朝活開始", created_at: "2024-12-31" },
+  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-10" },
+  { playlist_id: "1", title: "短い休憩開始", created_at: "2026-01-10" },
+  { playlist_id: "2", title: "英語学習開始", created_at: "2026-01-03" },
+  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-01" },
+  { playlist_id: "3", title: "朝活開始", created_at: "2026-12-31" },
+  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-10" },
+  { playlist_id: "1", title: "短い休憩開始", created_at: "2026-01-10" },
+  { playlist_id: "2", title: "英語学習開始", created_at: "2026-01-03" },
+  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-01" },
+  { playlist_id: "3", title: "朝活開始", created_at: "2026-12-31" },
+  // { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-02" },
+  // { playlist_id: "3", title: "朝活開始", created_at: "2026-01-02" },
+  // { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-02" },
+  // { playlist_id: "3", title: "朝活開始", created_at: "2026-01-02" },
+  // { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-02" },
+  // { playlist_id: "3", title: "朝活開始", created_at: "2026-01-02" },
 ];
 
 export default function LogPage() {
@@ -40,14 +46,20 @@ export default function LogPage() {
 
   // 1️⃣ 草の範囲（過去1年）
   const days = useMemo(() => {
-    const today = dayjs();
-    const start = today.subtract(1, "year").startOf("week");
-    const end = today.endOf("week");
+    const now = dayjs();
+
+    // 🎯 今年の始まりと終わり
+    const startOfYear = now.startOf("year"); // YYYY-01-01
+    const endOfYear = now.endOf("year"); // YYYY-12-31
+
+    // ⛳️ 週区切りに調整（GitHub風）
+    const start = startOfYear.startOf("week"); // 日曜
+    const end = endOfYear.endOf("week"); // 土曜
 
     const arr: string[] = [];
     let cursor = start;
 
-    while (cursor.isBefore(end)) {
+    while (cursor.isBefore(end) || cursor.isSame(end)) {
       arr.push(cursor.format("YYYY-MM-DD"));
       cursor = cursor.add(1, "day");
     }
@@ -90,6 +102,10 @@ export default function LogPage() {
       .slice(0, 10);
   }, [filteredLogs]);
 
+  const today = dayjs().format("YYYY-MM-DD");
+
+  console.log(today);
+
   return (
     <div className="pb-[116px]">
       <div className="flex items-center justify-center w-full h-16">
@@ -117,20 +133,29 @@ export default function LogPage() {
         </div>
 
         {/* 草 */}
-        <div className="flex gap-1 overflow-auto">
-          {Array.from({ length: Math.ceil(days.length / 7) }).map(
-            (_, weekIndex) => (
-              <div key={weekIndex} className="flex flex-col gap-1">
-                {days.slice(weekIndex * 7, weekIndex * 7 + 7).map((date) => (
-                  <div
-                    key={date}
-                    className={`w-3 h-3 rounded-xs ${getLevel(countMap[date])}`}
-                    title={`${date} : ${countMap[date] ?? 0} logs`}
-                  />
-                ))}
-              </div>
-            )
-          )}
+        <div className="">
+          <div className="flex gap-1 p-2 overflow-auto border border-neutral-900 rounded-sm">
+            {Array.from({ length: Math.ceil(days.length / 7) }).map(
+              (_, weekIndex) => (
+                <div key={weekIndex} className="flex flex-col gap-1">
+                  {days.slice(weekIndex * 7, weekIndex * 7 + 7).map((date) => (
+                    <div
+                      key={date}
+                      className={`
+    w-3 h-3 rounded-xs ${getLevel(countMap[date])}
+    ${
+      date === today
+        ? "ring-1 ring-neutral-600 ring-offset-2 ring-offset-neutral-950"
+        : ""
+    }
+  `}
+                      title={`${date} : ${countMap[date] ?? 0} logs`}
+                    />
+                  ))}
+                </div>
+              )
+            )}
+          </div>
         </div>
 
         {/* ログ一覧 */}

@@ -5,7 +5,7 @@ import { ROUTES } from "@/constants/routes";
 
 const Navigation = () => {
   return (
-    <div className="fixed bottom-0 w-full h-16 px-6 bg-neutral-950">
+    <div className="fixed bottom-0 w-full max-w-xl h-16 px-6 bg-neutral-950">
       <nav className="flex items-center justify-around gap-x-4 h-full">
         <div>
           <Link href={ROUTES.PLAYLIST.href}>

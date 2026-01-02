@@ -38,7 +38,7 @@ function Player() {
   if (!currentItem) return null;
 
   return (
-    <div className="fixed bottom-16 w-[calc(100%-16px)] h-13 mx-2 bg-[#0A0A0A] border border-neutral-900 rounded-lg flex flex-col justify-between overflow-hidden">
+    <div className="fixed bottom-16 max-w-xl w-[calc(100%-16px)] h-13 mx-2 bg-neutral-900 border border-neutral-800 rounded-lg flex flex-col justify-between overflow-hidden">
       <div className="flex items-center justify-between gap-x-2 p-2">
         <div className="flex items-center gap-x-2">
           <div className="size-8 rounded-sm bg-[#121212] flex items-center justify-center">

@@ -11,6 +11,7 @@ import {
   useDeletePlaylist,
   useReadPlaylists,
 } from "@/hooks/usePlaylists";
+import { Skeleton } from "@/lib/shadcn/skeleton";
 
 /**
  * プレイリスト一覧ページ
@@ -31,10 +32,6 @@ export default function Page() {
     deletePlaylist(id);
   };
 
-  if (isLoading) {
-    return <p>loading...</p>;
-  }
-
   return (
     <div>
       <div className="flex items-center justify-center w-full h-16">
@@ -48,39 +45,63 @@ export default function Page() {
           <span className="text-sm text-neutral-400">新規追加</span>
         </div>
         <div className="space-y-3">
-          {playlists.map((p) => (
-            <div
-              key={p.id}
-              className="flex items-center justify-between gap-x-2"
-            >
-              <div className="flex-1">
-                <Link href={`/playlists/${p.id}`}>
+          {isLoading ? (
+            <>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between gap-x-2"
+                >
                   <div className="flex-1 flex items-center gap-x-2">
-                    <div className="w-10 h-10 rounded-md bg-neutral-800"></div>
-                    <div className="flex-1 text-sm">{p.title}</div>
+                    {/* 左のアイコンボックス */}
+                    <Skeleton className="w-10 h-10 rounded-md" />
+
+                    {/* タイトル */}
+                    <Skeleton className="h-4 w-32" />
                   </div>
-                </Link>
+
+                  {/* 右のメニューアイコン */}
+                  <Skeleton className="size-6 rounded" />
+                </div>
+              ))}
+            </>
+          ) : (
+            playlists.map((p) => (
+              <div
+                key={p.id}
+                className="flex items-center justify-between gap-x-2"
+              >
+                <div className="flex-1">
+                  <Link href={`/playlists/${p.id}`}>
+                    <div className="flex-1 flex items-center gap-x-2">
+                      <div className="w-10 h-10 rounded-md bg-neutral-800 flex items-center justify-center">
+                        <p className="text-sm">🎷</p>
+                      </div>
+                      <div className="flex-1 text-sm">{p.title}</div>
+                    </div>
+                  </Link>
+                </div>
+                <div className="size-6">
+                  <DropdownMenu
+                    trigger={<Ellipsis className="size-5" />}
+                    items={[
+                      {
+                        id: "edit",
+                        label: "編集",
+                        onClick: () => console.log("編集"),
+                      },
+                      {
+                        id: "delete",
+                        label: "削除",
+                        danger: true,
+                        onClick: () => handleDeletePlaylist(p.id),
+                      },
+                    ]}
+                  />
+                </div>
               </div>
-              <div className="size-6">
-                <DropdownMenu
-                  trigger={<Ellipsis className="size-5" />}
-                  items={[
-                    {
-                      id: "edit",
-                      label: "編集",
-                      onClick: () => console.log("編集"),
-                    },
-                    {
-                      id: "delete",
-                      label: "削除",
-                      danger: true,
-                      onClick: () => handleDeletePlaylist(p.id),
-                    },
-                  ]}
-                />
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
       <PlaylistsDrawer
