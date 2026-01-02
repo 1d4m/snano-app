@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react"
+import { motion } from "motion/react";
 
 const barVariants = {
   animate: {
@@ -14,7 +14,7 @@ const PlayingAnimation = () => {
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
-          className="w-0.5 bg-emerald-500 origin-bottom h-full"
+          className="w-0.5 bg-emerald-400 origin-bottom h-full"
           variants={barVariants}
           animate="animate"
           transition={{
