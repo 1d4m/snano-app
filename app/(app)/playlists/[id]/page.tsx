@@ -41,7 +41,9 @@ export default function Page() {
   const item = useBoundStore((state) => state.currentItem);
 
   // プレイリストアイテム追加処理
-  const handleAddPlaylistItem = (item: Omit<PlaylistItem, "id" | "playlistId" | "isCompleted">) => {
+  const handleAddPlaylistItem = (
+    item: Omit<PlaylistItem, "id" | "playlistId" | "isCompleted">
+  ) => {
     const newItem = { ...item, playlistId: playlistId, isCompleted: false };
     createPlaylistItem(newItem);
   };
@@ -50,9 +52,9 @@ export default function Page() {
     deletePlaylistItem(id);
   };
 
-if (isLoading || playlistLoading || !playlist) {
-  return <p>loading...</p>;
-}
+  if (isLoading || playlistLoading || !playlist) {
+    return <p>loading...</p>;
+  }
 
   return (
     <div>
@@ -63,9 +65,7 @@ if (isLoading || playlistLoading || !playlist) {
           </Link>
         </div>
         <h1 className="flex-1 text-center font-bold text-sm">
-          <Suspense fallback={<p>...loading</p>}>
-            {playlist.title}
-          </Suspense>
+          <Suspense fallback={<p>...loading</p>}>{playlist.title}</Suspense>
         </h1>
         <div className="size-10"></div>
       </div>
@@ -82,17 +82,23 @@ if (isLoading || playlistLoading || !playlist) {
               key={p.id}
               className="flex items-center justify-between gap-x-2"
             >
-
               <div className="flex-1">
-                <div className="flex-1 flex items-center gap-x-2" onClick={() => setItem(p)}>
-                  <div
-                    className="flex items-center justify-center size-10 bg-[#121212] rounded-md"
-                  >
-                  </div>
+                <div
+                  className="flex-1 flex items-center gap-x-2"
+                  onClick={() => setItem(p)}
+                >
+                  <div className="flex items-center justify-center size-10 bg-[#121212] rounded-md"></div>
                   <div className="flex-1">
                     <div className="flex items-center gap-x-1">
                       {item?.id === p.id && isPlaying && <PlayingAnimation />}
-                      <span className={cn("text-sm text-neutral-400", item?.id === p.id && isPlaying && "text-emerald-400")}>{p.title}</span>
+                      <span
+                        className={cn(
+                          "text-sm text-neutral-400",
+                          item?.id === p.id && isPlaying && "text-emerald-400"
+                        )}
+                      >
+                        {p.title}
+                      </span>
                     </div>
                   </div>
                 </div>
