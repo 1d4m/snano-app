@@ -4,9 +4,9 @@ import { Pause, Play } from "lucide-react";
 import { useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
 
+import { useAlarm } from "@/hooks/useAlarm";
 import { useBoundStore } from "@/store";
 import { playerSelector } from "@/store/slices/player";
-import { playAlarmLoop } from "@/utils/alarm";
 
 function Player() {
   const {
@@ -19,6 +19,7 @@ function Player() {
     pause,
     stop,
   } = useBoundStore(useShallow(playerSelector));
+  const { playAlarm } = useAlarm();
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -26,7 +27,7 @@ function Player() {
     const id = setInterval(() => {
       setCount(1);
       if (getIsCompleted()) {
-        playAlarmLoop();
+        playAlarm();
         stop(); // または stop() でもOK
         clearInterval(id);
       }
