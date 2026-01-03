@@ -3,20 +3,32 @@
 import { useEffect, useRef, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 
+import { useCreateLog } from "@/hooks/useLog";
 import { useBoundStore } from "@/store";
 import { playerSelector } from "@/store/slices/player";
-import { stopAlarmLoop } from "@/utils/alarm";
 import { formatDuration } from "@/utils/formatDuration";
 
 function PlayerCompleteModal() {
-  const { completed, setReset } = useBoundStore(useShallow(playerSelector));
+  const { completed, currentItem, setReset } = useBoundStore(
+    useShallow(playerSelector)
+  );
 
-const [restSeconds, setRestSeconds] = useState(0);
+  const { mutate: createLog } = useCreateLog();
+
+  const [restSeconds, setRestSeconds] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const hasLoggedRef = useRef(false);
 
-  // ✅ 完了したら自動でカウントアップ開始
   useEffect(() => {
-    if (!completed) return;
+    if (!completed || hasLoggedRef.current || !currentItem) return;
+
+    hasLoggedRef.current = true;
+
+    createLog({
+      playlistId: currentItem.playlistId,
+      title: currentItem.title,
+      timestamp: new Date().toISOString(),
+    });
 
     intervalRef.current = setInterval(() => {
       setRestSeconds((s) => s + 1);
@@ -28,14 +40,13 @@ const [restSeconds, setRestSeconds] = useState(0);
         intervalRef.current = null;
       }
     };
-  }, [completed]);
+  }, [completed, currentItem]);
 
   const handleClick = () => {
-    stopAlarmLoop();
-    setReset(); // モーダルを閉じるトリガー
+    setReset();
     setRestSeconds(0);
+    hasLoggedRef.current = false;
   };
-
 
   if (!completed) return null;
 
