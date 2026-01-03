@@ -3,58 +3,36 @@
 import dayjs from "dayjs";
 import { useState, useMemo } from "react";
 
-type Playlist = {
-  id: string;
-  title: string;
-};
-
-type Log = {
-  playlist_id: string;
-  title: string;
-  created_at: string;
-};
-
-const mockPlaylists: Playlist[] = [
-  { id: "1", title: "集中タイマー" },
-  { id: "2", title: "勉強ルーティン" },
-  { id: "3", title: "朝活タスク" },
-];
-
-const mockLogs: Log[] = [
-  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-10" },
-  { playlist_id: "1", title: "短い休憩開始", created_at: "2026-01-10" },
-  { playlist_id: "2", title: "英語学習開始", created_at: "2026-01-03" },
-  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-01" },
-  { playlist_id: "3", title: "朝活開始", created_at: "2026-12-31" },
-  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-10" },
-  { playlist_id: "1", title: "短い休憩開始", created_at: "2026-01-10" },
-  { playlist_id: "2", title: "英語学習開始", created_at: "2026-01-03" },
-  { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-01" },
-  { playlist_id: "3", title: "朝活開始", created_at: "2026-12-31" },
-  // { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-02" },
-  // { playlist_id: "3", title: "朝活開始", created_at: "2026-01-02" },
-  // { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-02" },
-  // { playlist_id: "3", title: "朝活開始", created_at: "2026-01-02" },
-  // { playlist_id: "1", title: "ポモドーロ開始", created_at: "2026-01-02" },
-  // { playlist_id: "3", title: "朝活開始", created_at: "2026-01-02" },
-];
+import { useReadLogs } from "@/hooks/useLog";
+import { useReadPlaylists } from "@/hooks/usePlaylists";
 
 export default function LogPage() {
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | "all">(
     "all"
   );
 
-  // 1️⃣ 草の範囲（過去1年）
+  // 🎧 プレイリスト取得
+  const {
+    data: playlists = [],
+    isLoading: isPlaylistLoading,
+    isError: isPlaylistError,
+  } = useReadPlaylists();
+
+  // 📗 ログ取得
+  const {
+    data: logs = [],
+    isLoading,
+    isError,
+  } = useReadLogs(
+    selectedPlaylistId === "all" ? undefined : selectedPlaylistId
+  );
+
+  // 今年の草範囲
   const days = useMemo(() => {
     const now = dayjs();
 
-    // 🎯 今年の始まりと終わり
-    const startOfYear = now.startOf("year"); // YYYY-01-01
-    const endOfYear = now.endOf("year"); // YYYY-12-31
-
-    // ⛳️ 週区切りに調整（GitHub風）
-    const start = startOfYear.startOf("week"); // 日曜
-    const end = endOfYear.endOf("week"); // 土曜
+    const start = now.startOf("year").startOf("week");
+    const end = now.endOf("year").endOf("week");
 
     const arr: string[] = [];
     let cursor = start;
@@ -67,24 +45,16 @@ export default function LogPage() {
     return arr;
   }, []);
 
-  // 2️⃣ 選択中プレイリストのログに絞る
-  const filteredLogs = useMemo(() => {
-    return selectedPlaylistId === "all"
-      ? mockLogs
-      : mockLogs.filter((l) => l.playlist_id === selectedPlaylistId);
-  }, [selectedPlaylistId]);
-
-  // 3️⃣ 日付ごとのカウント
+  // 日毎カウント
   const countMap = useMemo(() => {
     const map: Record<string, number> = {};
-    filteredLogs.forEach((log) => {
-      const date = dayjs(log.created_at).format("YYYY-MM-DD");
+    logs.forEach((log) => {
+      const date = dayjs(log.timestamp).format("YYYY-MM-DD");
       map[date] = (map[date] ?? 0) + 1;
     });
     return map;
-  }, [filteredLogs]);
+  }, [logs]);
 
-  // 4️⃣ 草の色
   const getLevel = (count: number | undefined) => {
     if (!count) return "bg-neutral-900";
     if (count === 1) return "bg-emerald-900";
@@ -93,18 +63,16 @@ export default function LogPage() {
     return "bg-emerald-600";
   };
 
-  // 5️⃣ 直近10件
+  // 最新10件
   const latestLogs = useMemo(() => {
-    return [...filteredLogs]
+    return [...logs]
       .sort(
-        (a, b) => dayjs(b.created_at).valueOf() - dayjs(a.created_at).valueOf()
+        (a, b) => dayjs(b.timestamp).valueOf() - dayjs(a.timestamp).valueOf()
       )
       .slice(0, 10);
-  }, [filteredLogs]);
+  }, [logs]);
 
   const today = dayjs().format("YYYY-MM-DD");
-
-  console.log(today);
 
   return (
     <div className="pb-[116px]">
@@ -113,54 +81,80 @@ export default function LogPage() {
       </div>
 
       <div className="p-4 space-y-6">
-        {/* プレイリスト選択 */}
+        {/* 🎧 プレイリスト選択 */}
         <div>
           <label className="text-sm text-neutral-400 mr-2">プレイリスト</label>
-          <select
-            className="bg-neutral-900 border border-neutral-700 rounded px-2 py-1"
-            value={selectedPlaylistId}
-            onChange={(e) =>
-              setSelectedPlaylistId(e.target.value as "all" | string)
-            }
-          >
-            <option value="all">すべて</option>
-            {mockPlaylists.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.title}
-              </option>
-            ))}
-          </select>
+
+          {isPlaylistLoading && (
+            <span className="text-neutral-500 text-sm">読み込み中...</span>
+          )}
+
+          {isPlaylistError && (
+            <span className="text-red-400 text-sm">プレイリスト取得失敗</span>
+          )}
+
+          {!isPlaylistLoading && !isPlaylistError && (
+            <select
+              className="bg-neutral-900 border border-neutral-700 rounded px-2 py-1"
+              value={selectedPlaylistId}
+              onChange={(e) =>
+                setSelectedPlaylistId(e.target.value as "all" | string)
+              }
+            >
+              <option value="all">すべて</option>
+
+              {playlists.map((p) => (
+                <option key={p.id} value={p.id.toString()}>
+                  {p.title}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
+        {/* ローディング */}
+        {isLoading && (
+          <div className="text-neutral-500 text-sm">読み込み中...</div>
+        )}
+
+        {/* エラー */}
+        {isError && (
+          <div className="text-red-400 text-sm">ログの取得に失敗しました</div>
+        )}
+
         {/* 草 */}
-        <div className="">
-          <div className="flex gap-1 p-2 overflow-auto border border-neutral-900 rounded-sm">
-            {Array.from({ length: Math.ceil(days.length / 7) }).map(
-              (_, weekIndex) => (
-                <div key={weekIndex} className="flex flex-col gap-1">
-                  {days.slice(weekIndex * 7, weekIndex * 7 + 7).map((date) => (
-                    <div
-                      key={date}
-                      className={`
-    w-3 h-3 rounded-xs ${getLevel(countMap[date])}
-    ${
-      date === today
-        ? "ring-1 ring-neutral-600 ring-offset-2 ring-offset-neutral-950"
-        : ""
-    }
-  `}
-                      title={`${date} : ${countMap[date] ?? 0} logs`}
-                    />
-                  ))}
-                </div>
-              )
-            )}
+        {!isLoading && !isError && (
+          <div>
+            <div className="flex gap-1 p-2 overflow-auto border border-neutral-900 rounded-sm">
+              {Array.from({ length: Math.ceil(days.length / 7) }).map(
+                (_, weekIndex) => (
+                  <div key={weekIndex} className="flex flex-col gap-1">
+                    {days
+                      .slice(weekIndex * 7, weekIndex * 7 + 7)
+                      .map((date) => (
+                        <div
+                          key={date}
+                          className={`
+                            w-3 h-3 rounded-xs ${getLevel(countMap[date])}
+                            ${
+                              date === today
+                                ? "ring-1 ring-neutral-600 ring-offset-2 ring-offset-neutral-950"
+                                : ""
+                            }
+                          `}
+                          title={`${date} : ${countMap[date] ?? 0} logs`}
+                        />
+                      ))}
+                  </div>
+                )
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* ログ一覧 */}
         <div className="space-y-2">
-          {latestLogs.length === 0 && (
+          {!isLoading && latestLogs.length === 0 && (
             <div className="text-neutral-500 text-sm">ログはまだありません</div>
           )}
 
@@ -170,7 +164,7 @@ export default function LogPage() {
               className="p-3 border border-neutral-800 rounded-lg bg-neutral-900"
             >
               <div className="text-xs text-neutral-400">
-                {dayjs(log.created_at).format("YYYY/MM/DD")}
+                {dayjs(log.timestamp).format("YYYY/MM/DD")}
               </div>
               <div className="font-medium text-neutral-100">{log.title}</div>
             </div>

@@ -1,7 +1,6 @@
 import { SliceCreator } from "@/store";
 import { PlaylistItem } from "@/types/entities/playlistItem";
 
-
 /**
  * 状態セット（set）
 
@@ -125,7 +124,6 @@ export const createPlayerSlice: SliceCreator<PlayerSlice> = (set, get) => ({
 
   stop: () =>
     set((state) => {
-      state.currentItem = null;
       state.isPlaying = false;
       state.count = 0;
       // state.completed = false;
