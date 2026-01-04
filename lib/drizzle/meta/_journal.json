@@ -43,6 +43,20 @@
       "when": 1767490894082,
       "tag": "0005_huge_proteus",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1767527229851,
+      "tag": "0006_organic_harrier",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1767528348921,
+      "tag": "0007_clammy_sway",
+      "breakpoints": true
     }
   ]
 }
