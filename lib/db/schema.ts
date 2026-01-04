@@ -2,6 +2,23 @@ import { sql } from "drizzle-orm";
 import { pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
 /**
+ * ユーザー情報を保持するテーブル
+ *
+ * - id: ユーザーの一意な識別子
+ * - name: ユーザーの表示名
+ * - email: ユーザーのメールアドレス（ユニーク）
+ * - image: ユーザーのプロフィール画像URL
+ */
+const users = pgTable("users", {
+  id: text("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 256 }).notNull(),
+  email: varchar("email", { length: 256 }).notNull().unique(),
+  image: text("image"),
+});
+
+/**
  * プレイリスト情報を保持するテーブル
  *
  * - ユーザーが作成した「プレイリスト」の単位
@@ -11,6 +28,9 @@ const playlists = pgTable("playlists", {
   id: text("id")
     .primaryKey()
     .default(sql`gen_random_uuid()`),
+  user_id: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 256 }).notNull(),
 });
 
@@ -50,4 +70,4 @@ const logs = pgTable("logs", {
   timestamp: timestamp("timestamp", { mode: "string" }).notNull(),
 });
 
-export { playlists, playlist_items, logs };
+export { users, playlists, playlist_items, logs };
