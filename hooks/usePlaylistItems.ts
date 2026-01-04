@@ -21,13 +21,15 @@ const useReadPlaylistItems = (id: string) => {
 
 /**
  * プレイリストアイテム作成
- * 
+ *
  *   TData,     // 成功時に返ってくるデータの型
  *   TError,    // エラー時の型
  *   TVariables,// mutate()/mutationFn に渡す引数の型
  * @returns
  */
 const useCreatePlaylistItems = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<PlaylistItem, Error, PlaylistItemApiRequest>({
     mutationFn: async (newItem) => {
       const snakecaseBody = snakecaseKeys(newItem);
@@ -43,6 +45,9 @@ const useCreatePlaylistItems = () => {
       }
       const data = await response.json();
       return camelcaseKeys(data, { deep: true });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["playlistItems"] });
     },
   });
 };
