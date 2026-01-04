@@ -26,10 +26,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const data = await request.json();
 
-  const result = await db
-    .insert(playlist_items)
-    .values(data)
-    .returning();
+  const result = await db.insert(playlist_items).values(data).returning();
   return NextResponse.json(result);
 }
 
@@ -41,7 +38,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "id is required" }, { status: 400 });
   }
 
-  await db.delete(playlist_items).where(eq(playlist_items.id, Number(id)));
+  await db.delete(playlist_items).where(eq(playlist_items.id, id));
 
   return NextResponse.json({ message: "Deleted successfully" });
 }
