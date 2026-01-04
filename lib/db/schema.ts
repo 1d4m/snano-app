@@ -26,7 +26,7 @@ const playlist_items = pgTable("playlist_items", {
     .default(sql`gen_random_uuid()`),
   playlist_id: text("playlist_id")
     .notNull()
-    .references(() => playlists.id),
+    .references(() => playlists.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 256 }).notNull(),
   description: text("description"),
   limit_at: text("limit_at"),
@@ -45,7 +45,7 @@ const logs = pgTable("logs", {
     .default(sql`gen_random_uuid()`),
   playlist_id: text("playlist_id")
     .notNull()
-    .references(() => playlists.id),
+    .references(() => playlists.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   timestamp: timestamp("timestamp", { mode: "string" }).notNull(),
 });
