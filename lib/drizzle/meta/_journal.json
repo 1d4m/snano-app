@@ -36,6 +36,13 @@
       "when": 1767489963469,
       "tag": "0004_fancy_scarlet_witch",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1767490894082,
+      "tag": "0005_huge_proteus",
+      "breakpoints": true
     }
   ]
 }
