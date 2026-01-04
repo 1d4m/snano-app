@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { auth } from "@/auth";
 import { createLog, getLogs } from "@/lib/repositories/log";
 
 /**
@@ -8,11 +9,15 @@ import { createLog, getLogs } from "@/lib/repositories/log";
  * @returns
  */
 export async function GET(request: NextRequest) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
   const params = new URL(request.url).searchParams;
   const playlistId = params.get("playlistId") || undefined;
 
-  const data = await getLogs(playlistId);
-
+  const data = await getLogs(session.user.id, playlistId);
   return NextResponse.json(data);
 }
 

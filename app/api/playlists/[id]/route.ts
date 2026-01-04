@@ -13,7 +13,7 @@ export async function DELETE(
 
     const result = await db
       .delete(playlists)
-      .where(eq(playlists.id, Number(id)))
+      .where(eq(playlists.id, id))
       .returning();
 
     return NextResponse.json(result);
@@ -33,7 +33,7 @@ export async function GET(
     const result = await db
       .select()
       .from(playlists)
-      .where(eq(playlists.id, Number(id)));
+      .where(eq(playlists.id, id));
 
     if (result.length === 0) {
       return NextResponse.json(
